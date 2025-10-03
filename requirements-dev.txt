@@ -1,0 +1,5 @@
+pytest>=7.0.0
+black>=23.0.0
+build
+twine
+pre-commit

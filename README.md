@@ -27,7 +27,7 @@ Installation
 2. Optional: Erstellen Sie ein virtuelles Environment und aktivieren Sie es:
 
   ```powershell
-  python -m venv .venv; .\.venv\Scripts\Activate.ps1
+  python -m venv venv; .\venv\Scripts\Activate.ps1
   ```
 
 3. Abhängigkeiten installieren:
