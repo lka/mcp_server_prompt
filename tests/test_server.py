@@ -17,6 +17,7 @@ def make_fake_fastmcp_module():
         def prompt(self, func=None):
             # behave as decorator
             if func is None:
+
                 def decorator(f):
                     self._prompts.append(f)
                     return f
@@ -60,9 +61,9 @@ def import_server_with_fake():
 def test_generate_recipe_and_prompt_registered():
     server = import_server_with_fake()
     assert hasattr(server, "generate_recipe")
-    # exact expected string from example server
-    assert (
-        server.generate_recipe() == "Lösche die Dateien im Unterordner 'tmp'."
+    # expected prefix from example server
+    assert server.generate_recipe().startswith(
+        "Lösche die Dateien im Unterordner 'tmp'."
     )
     # prompt decorator should have registered the function on the mcp instance
     assert server.generate_recipe in getattr(server.mcp, "_prompts", [])

@@ -36,5 +36,5 @@ def main() -> None:
         print("Oder füge hier eigene Startlogik hinzu.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
