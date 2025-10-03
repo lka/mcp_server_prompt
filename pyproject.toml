@@ -7,14 +7,11 @@ name = "mcp_server_prompt"
 version = "0.0.2"
 description = "FastMCP Prompt-Server"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license-files = ["LICENSE"]
 authors = [ { name="Lka", email="mail@lischka-berlin.de" } ]
 keywords = ["mcp", "fastmcp", "prompt"]
 classifiers = [
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "License :: OSI Approved :: MIT License",
