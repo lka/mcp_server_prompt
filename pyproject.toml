@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp_server_prompt"
+version = "0.0.2"
+description = "FastMCP Prompt-Server"
+readme = "README.md"
+requires-python = ">=3.8"
+license-files = ["LICENSE"]
+authors = [ { name="Lka", email="mail@lischka-berlin.de" } ]
+keywords = ["mcp", "fastmcp", "prompt"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = [
+  "fastmcp>=2.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "build", "twine"]
+
+[project.scripts]
+promptServer = "mcp_server_prompt.server:main"
+
+[project.urls]
+Homepage = "https://github.com/lka/mcp_server_prompt"
+Repository = "https://github.com/lka/mcp_server_prompt"
+Issues = "https://github.com/lka/mcp_server_prompt/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
