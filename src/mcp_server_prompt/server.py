@@ -20,7 +20,7 @@ Erstelle eine HTML-Datei, die das Rezept mit dem extrahierten Text und Bild\
 Speichere die HTML-Datei im Verzeichnis 'Ausgang' ab.
 Stelle sicher, dass das Bild des Rezeptes im Unterverzeichnis\
  'Ausgang\\Images' gespeichert wird und in der HTML-Datei korrekt referenziert\
- wird.
+ wird. Achte dabei auf Umlaute und Sonderzeichen.
 Ergänze die Datei 'index.html' im Verzeichnis 'Ausgang', um auf die neue\
  Rezeptdatei zu verlinken."""
 
