@@ -9,7 +9,20 @@ mcp = FastMCP(name="PromptServer", on_duplicate_prompts="error")
 @mcp.prompt
 def generate_recipe() -> str:
     """Erstellt eine HTML-Datei mit einem gescannten Rezept."""
-    return "Lösche die Dateien im Unterordner 'tmp'."
+    return """Lösche die Dateien im Unterordner 'tmp'.
+Benutze für alle neu erzeugten Dateien das Verzeichnis 'tmp'.
+Extrahiere das Image aus der PDF im Verzeichnis 'Eingang'.
+Lasse mich die Regionen im Bild auswählen, die den Text und das Bild\
+ des Rezepts enthalten.
+Führe OCR auf den ausgewählten Textregionen durch.
+Erstelle eine HTML-Datei, die das Rezept mit dem extrahierten Text und Bild\
+ darstellt.
+Speichere die HTML-Datei im Verzeichnis 'Ausgang' ab.
+Stelle sicher, dass das Bild des Rezeptes im Unterverzeichnis\
+ 'Ausgang\\Images' gespeichert wird und in der HTML-Datei korrekt referenziert\
+ wird.
+Ergänze die Datei 'index.html' im Verzeichnis 'Ausgang', um auf die neue\
+ Rezeptdatei zu verlinken."""
 
 
 def main() -> None:
