@@ -10,6 +10,7 @@ mcp = FastMCP(name="PromptServer", on_duplicate_prompts="error")
 def generate_recipe() -> str:
     """Erstellt eine HTML-Datei mit einem gescannten Rezept."""
     return """Benutze für alle neu erzeugten Dateien das Verzeichnis 'tmp'.
+Die zu verwendende Sprache ist deutsch.
 Lasse mich aus der PDF im Verzeichnis 'Eingang' die Regionen im Bild\
  auswählen, die den Text und das Bild des Rezepts enthalten.
 Führe OCR auf den ausgewählten Textregionen durch.
