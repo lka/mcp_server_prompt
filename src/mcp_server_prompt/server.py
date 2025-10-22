@@ -18,7 +18,7 @@ Erstelle eine HTML-Datei, die das Rezept mit dem extrahierten Text und Bild\
  darstellt.
 Speichere die HTML-Datei im Verzeichnis 'Ausgang' ab.
 Für die HTML-Datei verwende die Struktur von Template.html im Verzeichnis\
- 'Ausgang' als Vorlage.
+ 'Ausgang' als Vorlage und verwende die darin enthaltenen TAGs.
 Stelle sicher, dass das Bild des Rezeptes im Unterverzeichnis\
  'Ausgang\\Images' gespeichert wird und in der HTML-Datei korrekt referenziert\
  wird. Achte dabei auf Umlaute und Sonderzeichen.
