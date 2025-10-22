@@ -63,7 +63,7 @@ def test_generate_recipe_and_prompt_registered():
     assert hasattr(server, "generate_recipe")
     # expected prefix from example server
     assert server.generate_recipe().startswith(
-        "Lösche die Dateien im Unterordner 'tmp'."
+        "Benutze für alle neu erzeugten Dateien das Verzeichnis 'tmp'."
     )
     # prompt decorator should have registered the function on the mcp instance
     assert server.generate_recipe in getattr(server.mcp, "_prompts", [])
