@@ -11,7 +11,7 @@ def generate_recipe() -> str:
     """Erstellt eine HTML-Datei mit einem gescannten Rezept."""
     return """Benutze für alle neu erzeugten Dateien das Verzeichnis 'tmp'.
 Die zu verwendende Sprache ist deutsch.
-Lasse mich aus der PDF im Verzeichnis 'Eingang' die Regionen im Bild\
+Lasse mich aus der PDF im Verzeichnis 'Eingang' die Regionen\
  auswählen, die den Text und das Bild des Rezepts enthalten.
 Führe OCR auf den ausgewählten Textregionen durch.
 Erstelle eine HTML-Datei, die das Rezept mit dem extrahierten Text und Bild\
