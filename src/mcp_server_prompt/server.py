@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+"""MCP Prompt Server für Rezept-Extraktion aus PDFs."""
 from fastmcp import FastMCP
 
 # from fastmcp.prompts.prompt import Message, PromptMessage, TextContent
@@ -16,22 +18,22 @@ def generate_recipe() -> str:
 Extrahiere ein Rezept aus einer PDF-Datei und erstelle eine formatierte HTML-Seite.
 
 ## Arbeitsverzeichnisse
-- **Temporäre Dateien**: `tmp/`
-- **Eingabe**: `Eingang/` (enthält PDF-Dateien)
+- **Temporaere Dateien**: `tmp/`
+- **Eingabe**: `Eingang/` (enthaelt PDF-Dateien)
 - **Ausgabe**: `Ausgang/` (HTML-Dateien und Bilder)
 - **Template**: `Ausgang/Template.html`
 
-## Schritt-für-Schritt Anleitung
+## Schritt-fuer-Schritt Anleitung
 
 ### 1. PDF-Analyse
-- Öffne die erste PDF-Datei aus dem Verzeichnis `Eingang/`
+- Oeffne die erste PDF-Datei aus dem Verzeichnis `Eingang/`
 - Zeige die PDF-Seite(n) an
-- Lasse mich interaktiv die Regionen auswählen für:
+- Lasse mich interaktiv die Regionen auswaehlen fuer:
   - Rezepttext (Zutaten, Zubereitung, etc.)
   - Rezeptbild (Foto des fertigen Gerichts)
 
 ### 2. Text-Extraktion
-- Führe OCR auf den ausgewählten Textregionen durch
+- Falls kein Text extrahiert wurde, fuehre OCR auf den ausgewaehlten Textregionen durch
 - Strukturiere den extrahierten Text nach:
   - Rezeptname
   - Zutaten
@@ -39,34 +41,34 @@ Extrahiere ein Rezept aus einer PDF-Datei und erstelle eine formatierte HTML-Sei
   - Weitere Metadaten (Portionen, Zeit, Schwierigkeit)
 
 ### 3. Bild-Verarbeitung
-- Extrahiere das Rezeptbild aus der ausgewählten Region
-- Speichere das Bild unter: `Ausgang/Images/<rezeptname>.jpg`
-- Verwende UTF-8 sichere Dateinamen (ersetze Umlaute: ä→ae, ö→oe, ü→ue, ß→ss)
+- Finde das Rezeptbild aus der ausgewaehlten Region
+- Bewege das Bild nach: `Ausgang/Images/<rezeptname>.png`
+- Verwende UTF-8 sichere Dateinamen (ersetze Umlaute):
 - Entferne oder ersetze Sonderzeichen durch Unterstriche
 
 ### 4. HTML-Generierung
 - Lade das Template aus `Ausgang/Template.html`
 - Verwende alle im Template definierten TAGs (wie <TITLE>, <INGREDIENTS>, <INSTRUCTIONS>, etc.)
-- Fülle die TAGs mit den extrahierten Daten
-- Referenziere das Bild mit relativem Pfad: `Images/<bildname>.jpg`
+- Fuelle die TAGs mit den extrahierten Daten
+- Referenziere das Bild mit relativem Pfad: `Images/<bildname>.png`
 - Stelle sicher, dass alle Umlaute und Sonderzeichen im HTML korrekt als UTF-8 kodiert sind
 - Speichere die HTML-Datei als: `Ausgang/<rezeptname>.html`
 
 ### 5. Index aktualisieren
-- Öffne die Datei `Ausgang/index.html`
-- Füge einen neuen Link zur erstellten Rezeptseite hinzu
-- Sortiere die Links alphabetisch (falls möglich)
+- Oeffne die Datei `Ausgang/index.html`
+- Fuege einen neuen Link zur erstellten Rezeptseite hinzu
+- Sortiere die Links alphabetisch (falls moeglich)
 
-### 6. Qualitätsprüfung
-- Öffne im Edge-Browser:
+### 6. Qualitaetspruefung
+- Oeffne im Edge-Browser:
   - Die Original-PDF aus `Eingang/`
   - Die neu erstellte HTML-Datei aus `Ausgang/`
-- Vergleiche visuell, ob alle Informationen korrekt übertragen wurden
+- Vergleiche visuell, ob alle Informationen korrekt uebertragen wurden
 
 ## Fehlerbehandlung
 - Falls keine PDF im `Eingang/` Verzeichnis vorhanden ist: Melde dies und beende
 - Falls Template.html fehlt: Melde dies und frage nach einem Basis-Template
-- Falls OCR fehlschlägt: Melde die betroffenen Regionen und biete manuelle Eingabe an
+- Falls OCR fehlschlaegt: Melde die betroffenen Regionen und biete manuelle Eingabe an
 """
 
 
