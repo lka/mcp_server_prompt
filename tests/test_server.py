@@ -62,9 +62,7 @@ def test_generate_recipe_and_prompt_registered():
     server = import_server_with_fake()
     assert hasattr(server, "generate_recipe")
     # expected prefix from example server
-    assert server.generate_recipe().startswith(
-        "Benutze für alle neu erzeugten Dateien das Verzeichnis 'tmp'."
-    )
+    assert server.generate_recipe().startswith("\n# Rezept-Extraktion aus PDF")
     # prompt decorator should have registered the function on the mcp instance
     assert server.generate_recipe in getattr(server.mcp, "_prompts", [])
 
