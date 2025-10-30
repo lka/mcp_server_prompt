@@ -41,8 +41,8 @@ Extrahiere ein Rezept aus einer PDF-Datei und erstelle eine formatierte HTML-Sei
   - Weitere Metadaten (Portionen, Zeit, Schwierigkeit)
 
 ### 3. Bild-Verarbeitung
-- Finde das Rezeptbild aus der ausgewaehlten Region
-- Bewege das Bild nach: `Ausgang/Images/<rezeptname>.png`
+- Finde das Rezeptbild aus der ausgewaehlten Region im Ordner `tmp/`
+- Bewege das Bild mit `move_file` nach: `Ausgang/Images/<rezeptname>.png`
 - Verwende UTF-8 sichere Dateinamen (ersetze Umlaute):
 - Entferne oder ersetze Sonderzeichen durch Unterstriche
 
