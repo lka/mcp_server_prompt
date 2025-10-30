@@ -65,6 +65,9 @@ Extrahiere ein Rezept aus einer PDF-Datei und erstelle eine formatierte HTML-Sei
   - Die neu erstellte HTML-Datei aus `Ausgang/`
 - Vergleiche visuell, ob alle Informationen korrekt uebertragen wurden
 
+### 7. Aufraeumen
+- Frage nach, ob du die Dateien im `Eingang/` Verzeichnis loeschen moechtest
+
 ## Fehlerbehandlung
 - Falls keine PDF im `Eingang/` Verzeichnis vorhanden ist: Melde dies und beende
 - Falls Template.html fehlt: Melde dies und frage nach einem Basis-Template
