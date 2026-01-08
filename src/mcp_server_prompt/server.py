@@ -48,7 +48,7 @@ Extrahiere ein Rezept aus einer PDF-Datei und erstelle eine formatierte HTML-Sei
 
 ### 4. HTML-Generierung
 - Lade das Template aus `Ausgang/Template.html`
-- Verwende alle im Template definierten TAGs (wie <TITLE>, <INGREDIENTS>, <INSTRUCTIONS>, etc.)
+- WICHTIG: Verwende alle im Template definierten TAGs (wie <TITLE>, <INGREDIENTS>, <INSTRUCTIONS>, etc.)
 - Fuelle die TAGs mit den extrahierten Daten
 - Referenziere das Bild mit relativem Pfad: `Images/<bildname>.png`
 - Stelle sicher, dass alle Umlaute und Sonderzeichen im HTML korrekt als UTF-8 kodiert sind
