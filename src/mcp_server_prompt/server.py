@@ -58,7 +58,7 @@ Extrahiere Rezepte aus PDF-Dateien und erstelle formatierte HTML-Seiten mit auto
 
 ### Dateimanagement:
 - tmp/ wird vom image-selector beim Start automatisch geleert
-- Pro PDF-Durchlauf: Nur Regionen aus diesem einen PDF
+- Pro PDF-Durchlauf: Regionen aus allen PDFs können verwendet werden
 - Keine manuelle Bereinigung nötig
 - Alle gefundenen Text-Regionen werden automatisch verwendet
 - Erstes gefundenes Foto wird automatisch verwendet
@@ -125,7 +125,7 @@ Falls ein PDF mehrere Rezepte enthält:
    Markiere ALLE Regionen für EIN Rezept:
    - Als 'text': Rezeptname, Zutaten, Zubereitung, Metadaten, Tipps, Quelle
    - Als 'foto': Hauptbild
-   
+
    Hinweis zur Quelle:
    - Meist am Rand oder Fuß der Seite
    - Format: "22 köstlich vegetarisch 02/2026" oder "köstlich vegetarisch 02/2026 22"
@@ -151,17 +151,17 @@ Falls ein PDF mehrere Rezepte enthält:
 1. **Liste ALLE Text-Regionen** aus tmp/:
    ```
    filesystem:list_directory in "tmp/"
-   Filtere nach: *_region*_text.txt
-   Sortiere numerisch nach region-Nummer
+   Filtere nach: *_text.txt
+   Sortiere alphabetisch
    ```
 
 2. **Lese ALLE Text-Dateien automatisch**:
    ```
    filesystem:read_file für JEDE *_text.txt Datei
-   Konkateniere in numerischer Reihenfolge (file1_region01, file1_region02, file2_region01, file2_region02, ...)
+   Konkateniere in alphabertischer Reihenfolge (file1_region01, file1_region02, file2_region01, file2_region02, ...)
    Speichere in Variable: full_recipe_text
    ```
-   
+
    **Keine Rückfragen** - alle gefundenen Text-Regionen werden verwendet!
 
 3. **Strukturiere den Text** (Pattern-Erkennung):
@@ -239,7 +239,7 @@ Falls ein PDF mehrere Rezepte enthält:
 1. **Finde Foto**:
    ```
    filesystem:list_directory in "tmp/"
-   Filtere: *_region*_foto.png
+   Filtere: *_foto.png
    Sortiere alphabetisch
    ```
 
@@ -248,7 +248,7 @@ Falls ein PDF mehrere Rezepte enthält:
    Bei 0 Fotos: Setze image_available = false
    Bei 1+ Fotos: Verwende das ERSTE gefundene Foto automatisch
    ```
-   
+
    **Keine Rückfragen** - erstes verfügbares Foto wird verwendet!
 
 3. **Erstelle sicheren Dateinamen** aus `recipe_name`:
@@ -401,7 +401,6 @@ Ausgabe: Gesamtzahl und Anzahl pro Kategorie
    ```
    windows-launcher:open_in_edge
    file_paths: [
-     "Eingang/<current_pdf_name>.pdf",
      "Ausgang/<safe_recipe_name>.html"
    ]
    ```
@@ -458,11 +457,11 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 **Aktionen**:
 
 1. **Frage**: "Weiteres Rezept extrahieren?"
-   
+
 2. **Bei JA**: Springe zu Schritt 1 (PDF-Auswahl)
    - Das erste PDF/PNG wird automatisch ausgewählt (alphabetisch)
    - tmp/ wird automatisch vom image-selector beim nächsten Start geleert!
-   
+
 3. **Bei NEIN**: Springe zu Schritt 10 (Abschluss)
 
 **Hinweis**: Keine manuelle Bereinigung nötig - der image-selector übernimmt das automatisch beim nächsten Aufruf.
@@ -491,7 +490,7 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 
    recipe-index:count_recipes
    Statistik: X Rezepte in Y Kategorien
-   
+
    💡 Hinweis: tmp/ wird beim nächsten Start automatisch bereinigt
    ```
 
