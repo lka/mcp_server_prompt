@@ -44,14 +44,15 @@ Extrahiere Rezepte aus PDF-Dateien und erstelle formatierte HTML-Seiten mit auto
 
 ### Ablauf:
 ```
-1. Wähle EIN PDF
-2. Öffne image-selector für dieses PDF
+1. Erstes PDF/PNG aus Eingang/ wird automatisch ausgewählt (alphabetisch)
+2. Öffne image-selector für dieses PDF/PNG
    → tmp/ wird automatisch geleert!
 3. Markiere ALLE Regionen für EIN Rezept
 4. Alle Text-Regionen → automatisch konkateniert
 5. Erstes Foto → automatisch verwendet
 6. HTML erstellt, Index aktualisiert, Protokolliert
 7. Für nächstes Rezept: Zurück zu Schritt 1
+   → Nächstes PDF/PNG wird automatisch ausgewählt
    → tmp/ wird wieder automatisch geleert
 ```
 
@@ -80,34 +81,34 @@ Falls ein PDF mehrere Rezepte enthält:
 **Aktionen**:
 1. Verwende `filesystem:list_directory` um Verzeichnisse zu prüfen: tmp/, Eingang/, Ausgang/, Ausgang/Images/
 
-2. Liste verfügbare PDFs:
-   ```
-   filesystem:list_directory in "Eingang/"
-   Sortiere PDFs alphabetisch
-   Zeige nummerierte Liste
-   ```
-
-3. Status-Ausgabe:
+2. Status-Ausgabe:
    ```
    recipe-index:count_recipes
 
    📋 Status:
-   • X PDF(s) gefunden: [Liste]
    • Template.html vorhanden: Ja/Nein
    • Anzahl Rezepte in Index: X (aus Y Kategorien)
    ```
 
-4. Prüfe ob `Ausgang/Template.html` existiert - falls NEIN: Erstelle Basis-Template
+3. Prüfe ob `Ausgang/Template.html` existiert - falls NEIN: Erstelle Basis-Template
 
 ---
 
 ### 1. PDF-Auswahl
 
 **Aktionen**:
-1. Bei 1 PDF: Automatisch auswählen
-2. Bei mehreren PDFs: Frage Nutzer welches PDF
+1. Liste Dateien im Eingangsverzeichnis:
+   ```
+   filesystem:list_directory in "Eingang/"
+   Filtere nach: *.pdf und *.png
+   Sortiere alphabetisch
+   ```
 
-3. Merke PDF-Namen: `current_pdf_name`
+2. Wähle automatisch das **erste PDF oder PNG** (alphabetisch)
+
+3. Merke Dateinamen: `current_pdf_name`
+
+**Keine Rückfragen** - immer das erste verfügbare PDF/PNG verwenden!
 
 ---
 
@@ -122,14 +123,20 @@ Falls ein PDF mehrere Rezepte enthält:
 2. Instruktionen für Nutzer:
    ```
    Markiere ALLE Regionen für EIN Rezept:
-   - Als 'text': Rezeptname, Zutaten, Zubereitung, Metadaten, Tipps
+   - Als 'text': Rezeptname, Zutaten, Zubereitung, Metadaten, Tipps, Quelle
    - Als 'foto': Hauptbild
+   
+   Hinweis zur Quelle:
+   - Meist am Rand oder Fuß der Seite
+   - Format: "22 köstlich vegetarisch 02/2026" oder "köstlich vegetarisch 02/2026 22"
+   - Die Seitenzahl wird später automatisch entfernt
    ```
 
 3. Nach Abschluss automatisch erstellt in tmp/:
    - `<pdf-name>_<timestamp>_region01_text.txt` (OCR durchgeführt)
    - `<pdf-name>_<timestamp>_region02_text.txt` (weitere Textregionen)
-   - `<pdf-name>_<timestamp>_regionXX_foto.png` (Bildregion)
+   - `<pdf-name>_<timestamp+n>_region01_text.txt` (weitere Textregionen)
+   - `<pdf-name>_<timestampX>_regionXX_foto.png` (Bildregion)
 
 4. Validierung: `image-selector:list_exported_regions`
 
@@ -151,10 +158,10 @@ Falls ein PDF mehrere Rezepte enthält:
 2. **Lese ALLE Text-Dateien automatisch**:
    ```
    filesystem:read_file für JEDE *_text.txt Datei
-   Konkateniere in numerischer Reihenfolge (region01, region02, ...)
+   Konkateniere in numerischer Reihenfolge (file1_region01, file1_region02, file2_region01, file2_region02, ...)
    Speichere in Variable: full_recipe_text
    ```
-
+   
    **Keine Rückfragen** - alle gefundenen Text-Regionen werden verwendet!
 
 3. **Strukturiere den Text** (Pattern-Erkennung):
@@ -204,6 +211,20 @@ Falls ein PDF mehrere Rezepte enthält:
    - Suche: "Nährwerte pro Portion:", "Kalorien:", "kcal"
    - Variable: `nutrition` (oder leer)
 
+   **i) Quelle** (optional):
+   - Suche nach kurzen Textregionen (< 100 Zeichen)
+   - Muster: Zeitschriftenname + Datum/Ausgabe
+   - Beispiele: "22 köstlich vegetarisch 02/2026", "köstlich vegetarisch 02/2026 22"
+   - **Bereinigung**:
+     - Entferne Seitenzahl am Anfang: `^\d+\s+` (z.B. "22 ")
+     - Entferne Seitenzahl am Ende: `\s+\d+$` (z.B. " 22")
+     - Entferne "Bild auf Seite X" oder ähnliche Phrasen
+   - Variable: `source` (oder leer wenn nicht gefunden)
+   - **Erkennungslogik**:
+     - Textregion enthält Jahreszahl (20XX) ODER Monatsangabe (01-12/20XX)
+     - Keine typischen Rezept-Keywords (Zutaten, Zubereitung, Tipp)
+     - Länge < 100 Zeichen
+
 4. **Validierung**:
    - Rezeptname gefunden? Falls NEIN: Nutze PDF-Name oder frage Nutzer
    - Mindestens 3 Zutaten? Falls NEIN: Warnung
@@ -227,7 +248,7 @@ Falls ein PDF mehrere Rezepte enthält:
    Bei 0 Fotos: Setze image_available = false
    Bei 1+ Fotos: Verwende das ERSTE gefundene Foto automatisch
    ```
-
+   
    **Keine Rückfragen** - erstes verfügbares Foto wird verwendet!
 
 3. **Erstelle sicheren Dateinamen** aus `recipe_name`:
@@ -283,6 +304,7 @@ Falls ein PDF mehrere Rezepte enthält:
    | `<INSTRUCTIONS>` | HTML Liste aus instructions |
    | `<TIPS>` | tips |
    | `<NUTRITION>` | nutrition (oder leer) |
+   | `<SOURCE>` | source (oder leer) |
 
 3. **Zutaten formatieren**:
    ```html
@@ -419,6 +441,7 @@ PDF: <current_pdf_name>.pdf
 Rezept: <recipe_name>
 HTML: <safe_recipe_name>.html
 Bild: <safe_image_name>.png (oder "Kein Bild")
+Quelle: <source> (oder "Keine Quelle")
 Kategorie: <chosen_category>
 Textregionen: X
 OCR-Qualität: ✓ Gut
@@ -434,11 +457,12 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 
 **Aktionen**:
 
-1. **Frage**: "Weiteres Rezept aus einem anderen PDF extrahieren?"
-
+1. **Frage**: "Weiteres Rezept extrahieren?"
+   
 2. **Bei JA**: Springe zu Schritt 1 (PDF-Auswahl)
+   - Das erste PDF/PNG wird automatisch ausgewählt (alphabetisch)
    - tmp/ wird automatisch vom image-selector beim nächsten Start geleert!
-
+   
 3. **Bei NEIN**: Springe zu Schritt 10 (Abschluss)
 
 **Hinweis**: Keine manuelle Bereinigung nötig - der image-selector übernimmt das automatisch beim nächsten Aufruf.
@@ -467,7 +491,7 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 
    recipe-index:count_recipes
    Statistik: X Rezepte in Y Kategorien
-
+   
    💡 Hinweis: tmp/ wird beim nächsten Start automatisch bereinigt
    ```
 
@@ -501,11 +525,20 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 **Normal**: Rezept wird ohne Bild erstellt
 **Wenn Foto erwartet**: Prüfe tmp/ auf *_foto.png Dateien
 
+### Quellen-Extraktion
+**Beispiele für erkannte Quellen**:
+- Input: "22 köstlich vegetarisch 02/2026" → Output: "köstlich vegetarisch 02/2026"
+- Input: "köstlich vegetarisch 02/2026 22" → Output: "köstlich vegetarisch 02/2026"
+- Input: "Essen & Trinken 3/2025" → Output: "Essen & Trinken 3/2025"
+- Input: "Bild auf Seite 22 köstlich vegetarisch 02/2026" → Output: "köstlich vegetarisch 02/2026"
+
+**Wenn keine Quelle gefunden**: <SOURCE> Tag bleibt leer oder zeigt "Quelle unbekannt"
+
 ---
 
 ## Best Practices
 
-1. **Ein PDF pro Durchlauf**: Pro Rezept ein PDF öffnen, alle Regionen markieren
+1. **Automatische PDF-Auswahl**: Das erste verfügbare PDF/PNG wird automatisch ausgewählt (alphabetisch), alle Regionen markieren
 
 2. **Automatische Verarbeitung**: Alle Text-Regionen und erstes Foto werden automatisch verwendet
 
