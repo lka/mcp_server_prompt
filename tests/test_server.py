@@ -4,39 +4,53 @@ import sys
 import types
 
 
+class FakeFastMCP:
+    def __init__(self, name=None, on_duplicate_prompts=None):
+        self.name = name
+        self.on_duplicate_prompts = on_duplicate_prompts
+        self._prompts = []
+        self._tools = []
+        self.run_called = False
+
+    def prompt(self, func=None):
+        # behave as decorator
+        if func is None:
+
+            def decorator(f):
+                self._prompts.append(f)
+                return f
+
+            return decorator
+        else:
+            self._prompts.append(func)
+            return func
+
+    def tool(self, func=None):
+        # behave as decorator
+        if func is None:
+
+            def decorator(f):
+                self._tools.append(f)
+                return f
+
+            return decorator
+        else:
+            self._tools.append(func)
+            return func
+
+    def run(self):
+        self.run_called = True
+
+    def serve(self):
+        self.serve_called = True
+
+    def start(self):
+        self.start_called = True
+
+
 def make_fake_fastmcp_module():
     mod = types.ModuleType("fastmcp")
-
-    class FastMCP:
-        def __init__(self, name=None, on_duplicate_prompts=None):
-            self.name = name
-            self.on_duplicate_prompts = on_duplicate_prompts
-            self._prompts = []
-            self.run_called = False
-
-        def prompt(self, func=None):
-            # behave as decorator
-            if func is None:
-
-                def decorator(f):
-                    self._prompts.append(f)
-                    return f
-
-                return decorator
-            else:
-                self._prompts.append(func)
-                return func
-
-        def run(self):
-            self.run_called = True
-
-        def serve(self):
-            self.serve_called = True
-
-        def start(self):
-            self.start_called = True
-
-    mod.FastMCP = FastMCP
+    mod.FastMCP = FakeFastMCP
     return mod
 
 
@@ -58,13 +72,28 @@ def import_server_with_fake():
     return importlib.import_module("mcp_server_prompt.server")
 
 
+def test_recipe_prompt_constant_exists():
+    server = import_server_with_fake()
+    assert hasattr(server, "RECIPE_PROMPT")
+    assert server.RECIPE_PROMPT.startswith("\n# Rezept-Extraktion aus PDF")
+
+
 def test_generate_recipe_and_prompt_registered():
     server = import_server_with_fake()
     assert hasattr(server, "generate_recipe")
-    # expected prefix from example server
-    assert server.generate_recipe().startswith("\n# Rezept-Extraktion aus PDF")
+    assert server.generate_recipe() == server.RECIPE_PROMPT
     # prompt decorator should have registered the function on the mcp instance
     assert server.generate_recipe in getattr(server.mcp, "_prompts", [])
+
+
+def test_get_recipe_prompt_tool_registered():
+    server = import_server_with_fake()
+    assert hasattr(server, "get_recipe_prompt")
+    assert server.get_recipe_prompt().startswith(
+        "ANWEISUNG FÜR DIE WEITERE BEARBEITUNG"
+    )
+    # tool decorator should have registered the function on the mcp instance
+    assert server.get_recipe_prompt in getattr(server.mcp, "_tools", [])
 
 
 def test_main_calls_run_if_available():

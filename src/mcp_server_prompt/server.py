@@ -7,11 +7,7 @@ from fastmcp import FastMCP
 mcp = FastMCP(name="PromptServer", on_duplicate_prompts="error")
 
 
-# Basic prompt returning a string (converted to user message automatically)
-@mcp.prompt
-def generate_recipe() -> str:
-    """Erstellt eine HTML-Datei mit einem gescannten Rezept aus einer PDF."""
-    return r"""
+RECIPE_PROMPT = r"""
 # Rezept-Extraktion aus PDF - Workflow mit recipe-index Konnektor (v2)
 
 ## Ziel
@@ -44,14 +40,13 @@ Extrahiere Rezepte aus PDF-Dateien und erstelle formatierte HTML-Seiten mit auto
 
 ### Ablauf:
 ```
-1. Erstes PDF/PNG aus Eingang/ wird automatisch ausgewählt (alphabetisch)
-2. Öffne image-selector für dieses PDF/PNG
+1. Öffne image-selector ohne Angabe eines PDF/PNG
    → tmp/ wird automatisch geleert!
-3. Markiere ALLE Regionen für EIN Rezept
-4. Alle Text-Regionen → automatisch konkateniert
-5. Erstes Foto → automatisch verwendet
-6. HTML erstellt, Index aktualisiert, Protokolliert
-7. Für nächstes Rezept: Zurück zu Schritt 1
+2. Markiere ALLE Regionen für EIN Rezept
+3. Alle Text-Regionen → automatisch konkateniert
+4. Erstes Foto → automatisch verwendet
+5. HTML erstellt, Index aktualisiert, Protokolliert
+6. Für nächstes Rezept: Zurück zu Schritt 1
    → Nächstes PDF/PNG wird automatisch ausgewählt
    → tmp/ wird wieder automatisch geleert
 ```
@@ -94,31 +89,10 @@ Falls ein PDF mehrere Rezepte enthält:
 
 ---
 
-### 1. PDF-Auswahl
+### 1. PDF-Analyse mit image-selector
 
 **Aktionen**:
-1. Liste Dateien im Eingangsverzeichnis:
-   ```
-   filesystem:list_directory in "Eingang/"
-   Filtere nach: *.pdf und *.png
-   Sortiere alphabetisch
-   ```
-
-2. Wähle automatisch das **erste PDF oder PNG** (alphabetisch)
-
-3. Merke Dateinamen: `current_pdf_name`
-
-**Keine Rückfragen** - immer das erste verfügbare PDF/PNG verwenden!
-
----
-
-### 2. PDF-Analyse mit image-selector
-
-**Aktionen**:
-1. Verwende `image-selector:select_image_regions`:
-   ```
-   Parameter: image_path: "Eingang/<current_pdf_name>.pdf"
-   ```
+1. Verwende `image-selector:select_image_regions`
 
 2. Instruktionen für Nutzer:
    ```
@@ -144,7 +118,7 @@ Falls ein PDF mehrere Rezepte enthält:
 
 ---
 
-### 3. Text-Extraktion
+### 2. Text-Extraktion
 
 **Aktionen**:
 
@@ -232,7 +206,7 @@ Falls ein PDF mehrere Rezepte enthält:
 
 ---
 
-### 4. Bild-Verarbeitung
+### 3. Bild-Verarbeitung
 
 **Aktionen**:
 
@@ -274,7 +248,7 @@ Falls ein PDF mehrere Rezepte enthält:
 
 ---
 
-### 5. HTML-Generierung
+### 4. HTML-Generierung
 
 **Aktionen**:
 1. Template laden:
@@ -345,11 +319,11 @@ Falls ein PDF mehrere Rezepte enthält:
 
 ---
 
-### 6. Index aktualisieren (recipe-index)
+### 5. Index aktualisieren (recipe-index)
 
 **Aktionen**:
 
-#### 6.1 Duplikatsprüfung
+#### 5.1 Duplikatsprüfung
 ```
 recipe-index:check_duplicate_recipe
 Parameter: recipe_name: <recipe_name>
@@ -363,7 +337,7 @@ b) Suffix: recipe_name → "<recipe_name> v2", safe_recipe_name → "_v2"
 c) Abbrechen
 ```
 
-#### 6.2 Kategorie bestimmen
+#### 5.2 Kategorie bestimmen
 ```
 recipe-index:suggest_recipe_category
 Parameter: recipe_name: <recipe_name>
@@ -377,7 +351,7 @@ Speichere Wahl in: chosen_category
 **Kategorien**:
 - Salate, Suppen, Vorspeisen & Snacks, Hauptgerichte, Brot & Gebäck, Desserts & Kuchen, Sonstiges
 
-#### 6.3 Rezept hinzufügen
+#### 5.3 Rezept hinzufügen
 ```
 recipe-index:add_recipe_to_index
 Parameter:
@@ -386,7 +360,7 @@ Parameter:
   - category: <chosen_category> (optional)
 ```
 
-#### 6.4 Validierung
+#### 5.4 Validierung
 ```
 recipe-index:count_recipes
 Ausgabe: Gesamtzahl und Anzahl pro Kategorie
@@ -394,7 +368,7 @@ Ausgabe: Gesamtzahl und Anzahl pro Kategorie
 
 ---
 
-### 7. Qualitätsprüfung
+### 6. Qualitätsprüfung
 
 **Aktionen**:
 1. Dateien öffnen:
@@ -424,7 +398,7 @@ Ausgabe: Gesamtzahl und Anzahl pro Kategorie
 
 ---
 
-### 8. Protokollierung
+### 7. Protokollierung
 
 **Aktionen**:
 ```
@@ -452,7 +426,7 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 
 ---
 
-### 9. Weitere Rezepte?
+### 8. Weitere Rezepte?
 
 **Aktionen**:
 
@@ -462,13 +436,13 @@ Index: Aktualisiert (Gesamt: X Rezepte)
    - Das erste PDF/PNG wird automatisch ausgewählt (alphabetisch)
    - tmp/ wird automatisch vom image-selector beim nächsten Start geleert!
 
-3. **Bei NEIN**: Springe zu Schritt 10 (Abschluss)
+3. **Bei NEIN**: Springe zu Schritt 9 (Abschluss)
 
 **Hinweis**: Keine manuelle Bereinigung nötig - der image-selector übernimmt das automatisch beim nächsten Aufruf.
 
 ---
 
-### 10. Aufräumen
+### 9. Aufräumen
 
 **Aktionen**:
 
@@ -553,6 +527,24 @@ Index: Aktualisiert (Gesamt: X Rezepte)
 
 8. **tmp/-Management**: Wird automatisch vom image-selector bereinigt - keine manuelle Intervention nötig
 """
+
+
+@mcp.prompt()
+def generate_recipe() -> str:
+    """Erstellt eine HTML-Datei mit einem gescannten Rezept aus einer PDF."""
+    return RECIPE_PROMPT
+
+
+@mcp.tool()
+def get_recipe_prompt() -> str:
+    """Gibt den Workflow-Prompt für Rezept-Extraktion aus PDFs zurück."""
+    return f"""ANWEISUNG FÜR DIE WEITERE BEARBEITUNG:
+
+Führe nun folgende Aufgabe aus:
+
+{RECIPE_PROMPT}
+
+Wichtig: Dies ist eine direkte Arbeitsanweisung. Befolge sie wie einen Benutzer-Request."""
 
 
 def main() -> None:

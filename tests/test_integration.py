@@ -37,59 +37,37 @@ def test_integration_with_real_fastmcp():
     # mcp sollte eine Instanz von fastmcp.FastMCP sein
     assert isinstance(server.mcp, fastmcp.FastMCP)
 
+    # RECIPE_PROMPT Konstante sollte existieren und den erwarteten Inhalt haben
+    assert hasattr(server, "RECIPE_PROMPT")
+    assert server.RECIPE_PROMPT.startswith("\n# Rezept-Extraktion aus PDF")
+
     # Die Prompt-Funktion sollte die erwartete Zeichenkette liefern
     # Manche Implementationen von fastmcp ersetzen die Python-Funktion
     # durch ein Wrapper-Objekt (z. B. FunctionPrompt). Versuche mehrere
     # Strategien, um den resultierenden String zu erhalten.
-    result = None
-    gen = getattr(server, "generate_recipe", None)
-    if callable(gen):
-        try:
-            result = gen()
-        except TypeError:
-            result = None
+    for func_name in ("generate_recipe", "get_recipe_prompt"):
+        result = None
+        gen = getattr(server, func_name, None)
+        if callable(gen):
+            try:
+                result = gen()
+            except TypeError:
+                result = None
 
-    if result is None and gen is not None:
-        # häufige Attribute, die die originale Funktion enthalten
-        for attr in ("fn", "func", "function", "wrapped", "__wrapped__"):
-            candidate = getattr(gen, attr, None)
-            if callable(candidate):
-                try:
-                    result = candidate()
-                    break
-                except TypeError:
-                    result = None
-
-    if result is None:
-        # Fallback: suche in mcp-registrierten Prompts nach einer Funktion
-        mp = getattr(server.mcp, "_prompts", None)
-        if mp:
-            for p in mp:
-                try:
-                    if getattr(p, "__name__", None) == "generate_recipe":
-                        result = p()
+        if result is None and gen is not None:
+            # häufige Attribute, die die originale Funktion enthalten
+            for attr in ("fn", "func", "function", "wrapped", "__wrapped__"):
+                candidate = getattr(gen, attr, None)
+                if callable(candidate):
+                    try:
+                        result = candidate()
                         break
-                except TypeError:
-                    # p ist eventuell ein Wrapper, versuche zugrundeliegende
-                    # attributes
-                    for attr in (
-                        "fn",
-                        "func",
-                        "function",
-                        "wrapped",
-                        "__wrapped__",
-                    ):
-                        candidate = getattr(p, attr, None)
-                        if callable(candidate):
-                            try:
-                                result = candidate()
-                                break
-                            except TypeError:
-                                result = None
-                    if result is not None:
-                        break
+                    except TypeError:
+                        result = None
 
-    assert (
-        result is not None
-    ), "Konnte den Rückgabewert von generate_recipe() nicht ermitteln"
-    assert result.startswith("Lösche die Dateien im Unterordner 'tmp'.")
+        assert (
+            result is not None
+        ), f"Konnte den Rückgabewert von {func_name}() nicht ermitteln"
+        assert (
+            result == server.RECIPE_PROMPT
+        ), f"{func_name}() liefert nicht RECIPE_PROMPT"
