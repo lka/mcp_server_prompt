@@ -5,7 +5,12 @@ Dieses Repository enthält einen Prompt-Server, der die Bibliothek `fastmcp` ver
 Kurzbeschreibung
 ---------------
 
-Das Paket definiert einen `FastMCP`-Server in `src/mcp_server_prompt/server.py` mit einem Prompt (`generate_recipe`).
+Das Paket definiert einen `FastMCP`-Server in `src/mcp_server_prompt/server.py` mit einem
+Prompt (`generate_recipe`) und einem Tool (`get_recipe_prompt`). Der Rezept-Workflow-Text
+liegt in der Konstanten `RECIPE_PROMPT` und wird von beiden Endpunkten genutzt:
+
+- **Prompt** `generate_recipe` — für MCP-Clients mit Prompt-Unterstützung (z. B. Claude Desktop, Cursor)
+- **Tool** `get_recipe_prompt` — für MCP-Clients die nur Tools unterstützen (z. B. LM Studio)
 
 Voraussetzungen
 ---------------
@@ -52,10 +57,17 @@ from fastmcp import FastMCP
 
 mcp = FastMCP(name="PromptServer", on_duplicate_prompts="error")
 
-@mcp.prompt
+RECIPE_PROMPT = r"""..."""  # Workflow-Text für Rezept-Extraktion
+
+@mcp.prompt()
 def generate_recipe() -> str:
-   """Erstellt eine HTML-Datei mit einem gescannten Rezept."""
-   return "Lösche die Dateien im Unterordner 'tmp'."
+   """Erstellt eine HTML-Datei mit einem gescannten Rezept aus einer PDF."""
+   return RECIPE_PROMPT
+
+@mcp.tool()
+def get_recipe_prompt() -> str:
+   """Gibt den Workflow-Prompt für Rezept-Extraktion aus PDFs zurück."""
+   return f"""ANWEISUNG FÜR DIE WEITERE BEARBEITUNG: ... {RECIPE_PROMPT} ..."""
 
 def main() -> None:
    """Starter-Funktion: versucht mcp.run/serve/start aufzurufen."""
@@ -63,6 +75,17 @@ def main() -> None:
 if __name__ == '__main__':
    main()
 ```
+
+Kompatibilität
+--------------
+
+| MCP-Primitive | Funktion             | Unterstützte Clients                        |
+|---------------|----------------------|---------------------------------------------|
+| Prompt        | `generate_recipe`    | Claude Desktop, Cursor, andere Prompt-Clients |
+| Tool          | `get_recipe_prompt`  | LM Studio, Claude Desktop, alle Tool-Clients |
+
+LM Studio (ab 0.3.17) unterstützt ausschließlich MCP-Tools, keine Prompts. Deshalb wird
+der Workflow-Text zusätzlich als Tool bereitgestellt.
 
 Entry-point / CLI
 -----------------

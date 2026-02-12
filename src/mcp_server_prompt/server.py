@@ -106,11 +106,9 @@ Falls ein PDF mehrere Rezepte enthält:
    - Die Seitenzahl wird später automatisch entfernt
    ```
 
-3. Nach Abschluss automatisch erstellt in tmp/:
-   - `<pdf-name>_<timestamp>_region01_text.txt` (OCR durchgeführt)
-   - `<pdf-name>_<timestamp>_region02_text.txt` (weitere Textregionen)
-   - `<pdf-name>_<timestamp+n>_region01_text.txt` (weitere Textregionen)
-   - `<pdf-name>_<timestampX>_regionXX_foto.png` (Bildregion)
+3. Nach Abschluss liefert der image-selector:
+   - `full_recipe_text`: Alle erkannten Texte alphabetisch konkateniert
+   - Foto-Dateien in tmp/: `<pdf-name>_<timestampX>_regionXX_foto.png`
 
 4. Validierung: `image-selector:list_exported_regions`
 
@@ -122,23 +120,12 @@ Falls ein PDF mehrere Rezepte enthält:
 
 **Aktionen**:
 
-1. **Liste ALLE Text-Regionen** aus tmp/:
-   ```
-   filesystem:list_directory in "tmp/"
-   Filtere nach: *_text.txt
-   Sortiere alphabetisch
-   ```
+1. **Verwende `full_recipe_text` aus der image-selector Antwort**:
+   - Der image-selector liefert alle erkannten Texte bereits alphabetisch konkateniert
+     als `full_recipe_text` in seiner Antwort zurück
+   - Kein manuelles Auslesen von Text-Dateien nötig
 
-2. **Lese ALLE Text-Dateien automatisch**:
-   ```
-   filesystem:read_file für JEDE *_text.txt Datei
-   Konkateniere in alphabertischer Reihenfolge (file1_region01, file1_region02, file2_region01, file2_region02, ...)
-   Speichere in Variable: full_recipe_text
-   ```
-
-   **Keine Rückfragen** - alle gefundenen Text-Regionen werden verwendet!
-
-3. **Strukturiere den Text** (Pattern-Erkennung):
+2. **Strukturiere den Text** (Pattern-Erkennung):
 
    **a) Rezeptname**:
    - Erste Überschrift, meist am Anfang
