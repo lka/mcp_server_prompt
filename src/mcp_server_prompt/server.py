@@ -319,7 +319,7 @@ Parameter: recipe_name: <recipe_name>
 **Wenn Duplikat gefunden**:
 ```
 Frage Nutzer: "Rezept existiert bereits. Was tun?"
-a) Überschreiben: remove_recipe_from_index → weiter zu 6.2
+a) Überschreiben: remove_recipe_from_index → weiter zu 5.2
 b) Suffix: recipe_name → "<recipe_name> v2", safe_recipe_name → "_v2"
 c) Abbrechen
 ```
